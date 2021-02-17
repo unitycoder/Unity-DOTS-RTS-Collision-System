@@ -214,9 +214,15 @@ public class UnitCollisionSystemFixedGrid : SystemBase
                 int gridIndex = cell * CELL_CAPACITY;
                 int count = 0;
                 while ( grid[ gridIndex + count ] != VOID_CELL_VALUE && count < CELL_CAPACITY )
-                    count++;
+                {
+                    if ( grid[ gridIndex + count ] != VOID_CELL_VALUE )
+                    {
+                        grid[ gridIndex + count ] = ( ushort ) ( indexOfFirstEntityInQuery + i ); // store the unit id in the grid
+                        break;
+                    }
 
-                grid[ gridIndex + count ] = ( ushort ) ( indexOfFirstEntityInQuery + i ); // store the unit id in the grid
+                    count++;
+                }
             }
         }
     }
