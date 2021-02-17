@@ -213,7 +213,7 @@ public class UnitCollisionSystemFixedGrid : SystemBase
 
                 int gridIndex = cell * CELL_CAPACITY;
                 int count = 0;
-                while ( grid[ gridIndex + count ] != VOID_CELL_VALUE && count < CELL_CAPACITY )
+                while ( count < CELL_CAPACITY )
                 {
                     if ( grid[ gridIndex + count ] != VOID_CELL_VALUE )
                     {
