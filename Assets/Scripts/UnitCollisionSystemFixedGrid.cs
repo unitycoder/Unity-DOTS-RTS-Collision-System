@@ -81,7 +81,7 @@ public class UnitCollisionSystemFixedGrid : SystemBase
                 spatialGrid = spatialGrid ,
             };
             JobHandle initHandle = initJob.Schedule( Dependency );
-            initHandle.Complete();
+            //initHandle.Complete();
 
             BuildGridJob buildGridJob = new BuildGridJob
             {
@@ -103,7 +103,7 @@ public class UnitCollisionSystemFixedGrid : SystemBase
             broadPhase = JobHandle.CombineDependencies(
                 buildGridJob.Schedule( query , initHandle ) ,
                 copyJob.Schedule( query , initHandle ) );
-            broadPhase.Complete();
+            //broadPhase.Complete();
         }
         else
         {
@@ -117,7 +117,7 @@ public class UnitCollisionSystemFixedGrid : SystemBase
             };
 
             JobHandle updateCellsBarrier = updateCellsJob.ScheduleParallel( query , 1 , Dependency );
-            updateCellsBarrier.Complete();
+            //updateCellsBarrier.Complete();
 
             CopyJob copyJob = new CopyJob
             {
@@ -151,7 +151,7 @@ public class UnitCollisionSystemFixedGrid : SystemBase
         };
 
         JobHandle narrowPhase = resolveCollisionsJob.Schedule( copyArray.Length , 80 , broadPhase );
-        narrowPhase.Complete();
+        //narrowPhase.Complete();
 
         WriteDataJob writeJob = new WriteDataJob
         {
@@ -162,8 +162,8 @@ public class UnitCollisionSystemFixedGrid : SystemBase
         };
 
         JobHandle writeBarrier = writeJob.ScheduleParallel( query , 1 , narrowPhase );
-        writeBarrier.Complete();
-        cellsToUpdate.Clear();
+        //writeBarrier.Complete();
+        //cellsToUpdate.Clear();
         Dependency = copyArray.Dispose( writeBarrier );
     }
     protected override void OnDestroy()
@@ -311,6 +311,8 @@ public class UnitCollisionSystemFixedGrid : SystemBase
                     }
                 }
             }
+
+            cellData.Clear();
         }
     }
     private struct CopyJob : IJobEntityBatchWithIndex
