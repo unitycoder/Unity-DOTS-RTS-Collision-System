@@ -33,15 +33,24 @@ public class UnitSpawner
     {
         int size = 1;
 
-    
+
         // call this as many times as you like
-        CreateArmy( new POS2D( 10 , 10 ) , size , size );
+
+        for ( int i = 0; i < 14; i++ )
+        {
+            for ( int j = 0; j < 14; j++ )
+            {
+                CreateArmy( new POS2D( 20 * i, 20 * j) , size , size );
+            }
+        }
+
+        /*CreateArmy( new POS2D( 10 , 10 ) , size , size );
         CreateArmy( new POS2D( 20 , 10 ) , size , size );
         CreateArmy( new POS2D( 30 , 10 ) , size , size );
         CreateArmy( new POS2D( 40 , 10 ) , size , size );
         CreateArmy( new POS2D( 50 , 10 ) , size , size );
         CreateArmy( new POS2D( 60 , 10 ) , size , size );
-        CreateArmy( new POS2D( 70 , 10 ) , size , size );
+        CreateArmy( new POS2D( 70 , 10 ) , size , size );*/
     }
     private void CreateArmy( POS2D pos , int sizeX , int sizeZ )
     {
@@ -79,25 +88,34 @@ public class UnitSpawner
             typeof( RenderMesh ) ,
             typeof( RenderBounds ) ,
             typeof( LocalToWorld ) ,
+
             typeof( Translation ) ,
             typeof( Rotation ) ,
             typeof( Scale ) ,
-            typeof( Velocity ) ,
+
+            typeof( MoveForce ) ,
+            typeof( Drag ) ,
             typeof( Mass ) ,
-            typeof( CollisionCell ) ,
+
+            typeof( Velocity ) ,
+            typeof( Direction ) ,
             typeof( TargetPosition ) ,
-            typeof( MoveSpeed ) );
+
+            typeof( CollisionCell ) ,
+            typeof( CollisionCellMulti ) );
 
         entityManager.SetComponentData( unit , new Velocity { Value = float3.zero } );
         entityManager.SetComponentData( unit , new Mass { Value = 1f } );
         entityManager.SetComponentData( unit , new TargetPosition { Value = new float3( UnityEngine.Random.Range(5, 100) , 1 , UnityEngine.Random.Range( 5 , 100 ) ) } );
-        entityManager.SetComponentData( unit , new MoveSpeed { Walk = 0.4f , Run = 0.8f } );
+        entityManager.SetComponentData( unit , new MoveForce { Value = 0.4f } );
+        entityManager.SetComponentData( unit , new Drag { Value = 1.05f } );
+        entityManager.SetComponentData( unit , new Direction { Value = new float3( 0 , 0 , 0 ) } );
 
-        entityManager.SetSharedComponentData( unit , new RenderMesh
+        /*entityManager.SetSharedComponentData( unit , new RenderMesh
         {
             mesh = unitMesh ,
             material = unitMaterial
-        } );
+        } );*/
 
         entityManager.SetComponentData( unit , new Translation { Value = new float3( pos2D.x , 1 , pos2D.z ) } );
         entityManager.SetComponentData( unit , new Scale { Value = UNIT_SCALE } );
