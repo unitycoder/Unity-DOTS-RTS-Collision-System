@@ -9,11 +9,14 @@ public struct UnitTag : IComponentData
 
 }
 
-public struct UnitMoving : IComponentData
+public struct Moving : IComponentData
 {
     public int Value;
 }
-
+public struct Selected : IComponentData
+{
+    public bool Value;
+}
 public struct Direction : IComponentData
 {
     public float3 Value;
@@ -44,8 +47,8 @@ public struct CollisionCell : IComponentData
 }
 public struct CollisionCellMulti : IComponentData
 {
-    public ushort main;
-    public ushort xNei;
-    public ushort zNei;
-    public ushort cNei;
+    public int bL;
+    public int bR;
+    public int tL;
+    public int tR;
 }

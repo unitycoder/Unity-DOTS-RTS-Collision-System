@@ -6,9 +6,9 @@ public class CameraController : MonoBehaviour
 {
     [SerializeField] private float _mouseSense = 1.8f;
     [SerializeField] private float _translationSpeed = 15f;
-    [SerializeField] private float _movementSpeed = 3f;
+    [SerializeField] private float _movementSpeed = 0.5f;
     [SerializeField] private float _boostedSpeed = 20f;
-    [SerializeField] private float _keyboardRotationSpeed = 3f;
+    [SerializeField] private float _keyboardRotationSpeed = 0.5f;
 
     private bool zoomToLocation = false;
     private Vector3 zoomLocation = Vector3.zero;
@@ -32,7 +32,6 @@ public class CameraController : MonoBehaviour
         {
             deltaPosition += transform.forward;
             zoomToLocation = false;
-            Debug.Log( "Pressed" );
         }
         if ( Input.GetKey( KeyCode.S ) )
         {
