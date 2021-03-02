@@ -10,12 +10,16 @@ this shortcut allows my broadphase to be much faster.
 You can get away with updating the grid every 5 minutes, so no big deal.
 
 
-UnitCollisionSystem is the main file, the others are just scripts to setup a very basic scene, sorry about the mess lol.
+UnitDynamicCollisionSystemGrid is the main file, the others are just scripts to setup a very basic scene, sorry about the mess lol.
 If the scene has some broken dependencies, all you have to do is add a mesh and material to GameManager in the editor,
 and it should work.
 You can change the number of units and where they spawn in UnitSpawner()
 
 You can control the camera in Play-Mode with WASD, TG, and mouse.
+You can select units with left click, or drag select, and right click to send them to location
+By default, all units have random target position
+You can disable this in unit spawner
+You can change number of units spanwed and where they spawn in unit spawner
 
 
 I chose a grid to represent spatial partitioning because you just can't beat the performance of the grid
@@ -24,3 +28,8 @@ because people have so much ram today that it doesn't really matter, and the per
 
 I have tried quadtree, and spatial hashing, and those use much less memory, but they just bottleneck above
 30k units on my machine, and in my case I want to push 50k units.
+
+Next updates include:
+- hierarchical grid, for different unit sizes
+- k-d or binary tree for static collision
+- SIMD some stuff
