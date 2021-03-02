@@ -6,6 +6,7 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
 
+// CAPITOL VARIABLE NAMES WITH _ ARE CONSTANTS
 public class UnitDynamicCollisionSystemGrid : SystemBase
 {
     private NativeArray<ushort> grid;

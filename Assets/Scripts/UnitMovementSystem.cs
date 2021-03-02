@@ -4,13 +4,8 @@ using Unity.Jobs;
 using Unity.Burst;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine;
-
 public class UnitMovementSystem : SystemBase
 {
-    private const float Bounds = 50f;
-    private bool started = false;
-
     private EntityQuery query;
 
     protected override void OnCreate()
@@ -24,7 +19,6 @@ public class UnitMovementSystem : SystemBase
         };
         query = GetEntityQuery( description );
     }
-
     protected override void OnUpdate()
     {
         query = GetEntityQuery( typeof( UnitTag ) );

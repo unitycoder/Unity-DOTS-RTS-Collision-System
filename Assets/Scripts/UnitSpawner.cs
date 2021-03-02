@@ -11,13 +11,22 @@ public class UnitSpawner
     private Mesh unitMesh;
     private Material unitMaterial;
 
+    // THIS TOGGLES WETHER ALL UNITS WILL BE GIVEN A RANDOM POSITION TO MOVE TO AT START
+    // IF SET TO FALSE, USE MOUSE TO DRAG/CLICK SELECT UNITS THEN RIGHT CLICK TO SEND THEM TO A POSITION
+    private bool RANDOM_POSITION = true;
+
+    // Just unit spacing data, units spawned in "groups" withing "armies", which are groups of groups
     private const float UNIT_SCALE = 0.5f;
-    private const int UNITS_WIDE = 8; // basically how many units wide and long in a group
-    private const int UNITS_LONG = 25;
     private const float UNIT_SPACING = 0.25f;
     private const float GROUP_SPACING = 1f;
     private const float GROUP_SIZE_X = ( UNIT_SCALE + UNIT_SPACING ) * UNITS_WIDE;
     private const float GROUP_SIZE_Z = ( UNIT_SCALE + UNIT_SPACING ) * UNITS_LONG;
+
+    // CHANGE THESE TO ALTER NUMBER OF UNITS SPAWNED
+    private const int UNITS_WIDE = 8;
+    private const int UNITS_LONG = 25;
+    private const int GROUPS_LONG = 1;
+    private const int GROUPS_WIDE = 1;
 
     public UnitSpawner( Mesh mesh , Material material )
     {
@@ -31,26 +40,9 @@ public class UnitSpawner
 
     private void CreateUnits()
     {
-        int size = 1;
-
-
-        // call this as many times as you like
-
-        for ( int i = 0; i < 3; i++ )
-        {
-            for ( int j = 0; j < 3; j++ )
-            {
-                CreateArmy( new POS2D( 10 * i + 20 , 20 * j + 20 ) , size , size );
-            }
-        }
-
-        /*CreateArmy( new POS2D( 10 , 10 ) , size , size );
-        CreateArmy( new POS2D( 20 , 10 ) , size , size );
-        CreateArmy( new POS2D( 30 , 10 ) , size , size );
-        CreateArmy( new POS2D( 40 , 10 ) , size , size );
-        CreateArmy( new POS2D( 50 , 10 ) , size , size );
-        CreateArmy( new POS2D( 60 , 10 ) , size , size );
-        CreateArmy( new POS2D( 70 , 10 ) , size , size );*/
+        for ( int i = 0; i < 17; i++ )
+            for ( int j = 0; j < 17; j++ )
+                CreateArmy( new POS2D( 10 * i + 20 , 20 * j + 20 ) , GROUPS_WIDE , GROUPS_LONG );
     }
     private void CreateArmy( POS2D pos , int sizeX , int sizeZ )
     {
@@ -108,19 +100,23 @@ public class UnitSpawner
 
         entityManager.SetComponentData( unit , new Velocity { Value = float3.zero } );
         entityManager.SetComponentData( unit , new Mass { Value = 1f } );
-        entityManager.SetComponentData( unit , new TargetPosition { Value = new float3( UnityEngine.Random.Range(5, 5000) , 1 , UnityEngine.Random.Range( 5 , 5000 ) ) } );
-        //entityManager.SetComponentData( unit , new TargetPosition { Value = new float3( pos2D.x + 1 , 1 , pos2D.z + 1) } );
+
+        if (RANDOM_POSITION)
+            entityManager.SetComponentData( unit , new TargetPosition { Value = new float3( UnityEngine.Random.Range( 5 , 5000 ) , 1 , UnityEngine.Random.Range( 5 , 5000 ) ) } );
+        else
+            entityManager.SetComponentData( unit , new TargetPosition { Value = new float3( pos2D.x + 1 , 1 , pos2D.z + 1) } );
+
         entityManager.SetComponentData( unit , new Selected { Value = false } );
         entityManager.SetComponentData( unit , new Moving { Value = -1 } );
         entityManager.SetComponentData( unit , new MoveForce { Value = UnityEngine.Random.Range( 10f , 35f ) } );
         entityManager.SetComponentData( unit , new Drag { Value = 1.05f } );
         entityManager.SetComponentData( unit , new Direction { Value = new float3( 0 , 0 , 0 ) } );
 
-        entityManager.SetSharedComponentData( unit , new RenderMesh
+        /*entityManager.SetSharedComponentData( unit , new RenderMesh
         {
             mesh = unitMesh ,
             material = unitMaterial
-        } );
+        } );*/
 
         entityManager.SetComponentData( unit , new Translation { Value = new float3( pos2D.x , 1 , pos2D.z ) } );
         entityManager.SetComponentData( unit , new Scale { Value = UNIT_SCALE } );
