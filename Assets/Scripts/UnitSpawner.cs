@@ -108,11 +108,10 @@ public class UnitSpawner
 
         entityManager.SetComponentData( unit , new Velocity { Value = float3.zero } );
         entityManager.SetComponentData( unit , new Mass { Value = 1f } );
-        //entityManager.SetComponentData( unit , new TargetPosition { Value = new float3( UnityEngine.Random.Range(5, 5000) , 1 , UnityEngine.Random.Range( 5 , 5000 ) ) } );
-        entityManager.SetComponentData( unit , new TargetPosition { Value = new float3( pos2D.x + 1 , 1 , pos2D.z + 1) } );
+        entityManager.SetComponentData( unit , new TargetPosition { Value = new float3( UnityEngine.Random.Range(5, 5000) , 1 , UnityEngine.Random.Range( 5 , 5000 ) ) } );
+        //entityManager.SetComponentData( unit , new TargetPosition { Value = new float3( pos2D.x + 1 , 1 , pos2D.z + 1) } );
         entityManager.SetComponentData( unit , new Selected { Value = false } );
         entityManager.SetComponentData( unit , new Moving { Value = -1 } );
-        //entityManager.SetComponentData( unit , new TargetPosition { Value = new float3( 20 , 1 , 20 ) } );
         entityManager.SetComponentData( unit , new MoveForce { Value = UnityEngine.Random.Range( 10f , 35f ) } );
         entityManager.SetComponentData( unit , new Drag { Value = 1.05f } );
         entityManager.SetComponentData( unit , new Direction { Value = new float3( 0 , 0 , 0 ) } );

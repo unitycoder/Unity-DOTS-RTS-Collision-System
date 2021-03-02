@@ -26,7 +26,7 @@ using Unity.Transforms;
 public class UnitCollisionSystemFixedGrid : SystemBase
 {
     // add more grids which are bigger and bigger cells for potential larger units
-    private NativeArray<ushort> spatialGrid; // ushort because grids take up alot of memory if they are large
+    private NativeArray<ushort> grid; // ushort because grids take up alot of memory if they are large
     private NativeQueue<UpdateCellData> cellsToUpdate;
     private NativeBitArray cellFlags;
 
@@ -42,7 +42,7 @@ public class UnitCollisionSystemFixedGrid : SystemBase
     protected override void OnStartRunning()
     {
         base.OnStartRunning();
-        spatialGrid = new NativeArray<ushort>( CELLS_ACROSS * CELLS_ACROSS * CELL_CAPACITY , Allocator.Persistent , NativeArrayOptions.UninitializedMemory );
+        /*grid = new NativeArray<ushort>( CELLS_ACROSS * CELLS_ACROSS * CELL_CAPACITY , Allocator.Persistent , NativeArrayOptions.UninitializedMemory );
         cellsToUpdate = new NativeQueue<UpdateCellData>( Allocator.Persistent );
         cellFlags = new NativeBitArray( CELLS_ACROSS * CELLS_ACROSS , Allocator.Persistent , NativeArrayOptions.ClearMemory );
         query = GetEntityQuery( typeof( UnitTag ) );
@@ -50,7 +50,7 @@ public class UnitCollisionSystemFixedGrid : SystemBase
         InitializeGridJob initJob = new InitializeGridJob // set all grid values to void value
         {
             VOID_CELL_VALUE = VOID_CELL_VALUE ,
-            spatialGrid = spatialGrid ,
+            spatialGrid = grid ,
         };
         JobHandle handle = initJob.Schedule( Dependency );
         handle.Complete();
@@ -62,22 +62,21 @@ public class UnitCollisionSystemFixedGrid : SystemBase
             VOID_CELL_VALUE = VOID_CELL_VALUE ,
             translationHandle = GetComponentTypeHandle<Translation>() ,
             cellHandle = GetComponentTypeHandle<CollisionCell>() ,
-            grid = spatialGrid,
+            grid = grid,
         };
         handle = buildGridJob.Schedule( query , handle );
         handle.Complete();
-        Dependency = handle;
+        Dependency = handle;*/
     }
     protected override void OnUpdate()
     {
-        //TestSystem();
-        CollisionSystem1();
+        //CollisionSystem1();
     }
     protected override void OnDestroy()
     {
-        spatialGrid.Dispose();
+        /*grid.Dispose();
         cellsToUpdate.Dispose();
-        cellFlags.Dispose();
+        cellFlags.Dispose();*/
         base.OnDestroy();
     }
 
@@ -112,7 +111,7 @@ public class UnitCollisionSystemFixedGrid : SystemBase
         {
             CELL_CAPACITY = CELL_CAPACITY ,
             VOID_CELL_VALUE = VOID_CELL_VALUE ,
-            grid = spatialGrid ,
+            grid = grid ,
             cellData = cellsToUpdate
         };
         handle = JobHandle.CombineDependencies(
@@ -125,7 +124,7 @@ public class UnitCollisionSystemFixedGrid : SystemBase
             CELLS_ACROSS = CELLS_ACROSS ,
             CELL_CAPACITY = CELL_CAPACITY ,
             RADIUS = 0.5f , // can make this a component
-            grid = spatialGrid ,
+            grid = grid ,
             copyUnitData = copyArray ,
         };
         handle = resolveCollisionsJob.Schedule( copyArray.Length , 80 , handle );
@@ -162,7 +161,7 @@ public class UnitCollisionSystemFixedGrid : SystemBase
             CELL_SIZE = CELL_SIZE ,
             CELLS_ACROSS = CELLS_ACROSS ,
             CELL_CAPACITY = CELL_CAPACITY ,
-            grid = spatialGrid ,
+            grid = grid ,
             cellHandle = GetComponentTypeHandle<CollisionCell>()
         };
         handle = testJob.Schedule( query , handle );
