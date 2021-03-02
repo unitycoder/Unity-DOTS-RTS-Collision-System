@@ -1,6 +1,8 @@
 using UnityEngine;
 using Unity.Mathematics;
 
+// same
+
 [RequireComponent( typeof( Camera ) )]
 public class CameraController : MonoBehaviour
 {

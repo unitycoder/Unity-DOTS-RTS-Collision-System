@@ -6,6 +6,8 @@ using Unity.Burst;
 using Unity.Mathematics;
 using Unity.Transforms;
 
+// OLD
+
 // Grid containes ID's of entities in cells
 
 // Store current cell with entities

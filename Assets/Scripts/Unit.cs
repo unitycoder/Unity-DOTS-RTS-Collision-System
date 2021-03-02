@@ -4,6 +4,8 @@ using UnityEngine;
 using Unity.Transforms;
 using Unity.Mathematics;
 
+// same
+
 public struct UnitTag : IComponentData
 {
 

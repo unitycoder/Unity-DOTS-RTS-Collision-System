@@ -4,6 +4,8 @@ using Unity.Rendering;
 using Unity.Transforms;
 using UnityEngine;
 
+// same
+
 public class UnitSpawner
 {
     private EntityManager entityManager;

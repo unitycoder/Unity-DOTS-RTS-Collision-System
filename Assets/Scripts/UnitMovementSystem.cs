@@ -4,6 +4,9 @@ using Unity.Jobs;
 using Unity.Burst;
 using Unity.Mathematics;
 using Unity.Transforms;
+
+// reworked
+
 public class UnitMovementSystem : SystemBase
 {
     private EntityQuery query;

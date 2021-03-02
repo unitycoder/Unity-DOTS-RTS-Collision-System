@@ -6,6 +6,8 @@ using Unity.Collections;
 using Unity.Burst;
 using Unity.Jobs;
 
+// new
+
 [AlwaysUpdateSystem]
 public class InputSystem : SystemBase
 {

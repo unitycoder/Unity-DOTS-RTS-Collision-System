@@ -6,6 +6,8 @@ using Unity.Burst;
 using Unity.Mathematics;
 using Unity.Transforms;
 
+// OLD
+
 public class UnitCollisionSystemMap : SystemBase
 {
     private NativeMultiHashMap<int , int> map;
