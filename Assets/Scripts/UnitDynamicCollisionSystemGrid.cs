@@ -6,7 +6,6 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
 
-
 public class UnitDynamicCollisionSystemGrid : SystemBase
 {
     private NativeArray<ushort> grid;
@@ -77,7 +76,6 @@ public class UnitDynamicCollisionSystemGrid : SystemBase
         var copyMass        = new NativeArray<byte>( numUnits , Allocator.TempJob , NativeArrayOptions.UninitializedMemory );
         var collisionFlags  = new NativeBitArray( numUnits , Allocator.TempJob , NativeArrayOptions.ClearMemory );
         var collisionPairs  = new NativeQueue<CollidingPair>( Allocator.TempJob );
-        JobHandle handle = new JobHandle();
 
         var updateUnitCells = new UpdateUnitCellsJob // Update the cell the unit is currently in and queue changed cells
         {
@@ -87,7 +85,7 @@ public class UnitDynamicCollisionSystemGrid : SystemBase
             translationHandle = GetComponentTypeHandle<Translation>() ,
             cellHandle = GetComponentTypeHandle<CollisionCell>()
         };
-        handle = updateUnitCells.ScheduleParallel( query , 1 , Dependency );
+        JobHandle handle = updateUnitCells.ScheduleParallel( query , 1 , Dependency );
 
         var updateGridCells = new UpdateGridCellsJob // remove units from old cells and add to new ones
         {
@@ -96,9 +94,9 @@ public class UnitDynamicCollisionSystemGrid : SystemBase
             grid = grid ,
             cellData = cellsToUpdate
         };
-        JobHandle updateGridHandle = updateGridCells.Schedule( handle );
+        handle = updateGridCells.Schedule( handle );
 
-        var copyUnitPosition = new CopyTranslationsJob
+        var copyUnitPosition = new CopyPositionsJob
         {
             translationHandle = GetComponentTypeHandle<Translation>() ,
             copyArray = copyPositions
@@ -113,14 +111,10 @@ public class UnitDynamicCollisionSystemGrid : SystemBase
             massHandle = GetComponentTypeHandle<Mass>() ,
             copyArray = copyMass
         };
-        JobHandle copyHandle = JobHandle.CombineDependencies(
+        handle = JobHandle.CombineDependencies(
             copyUnitPosition.ScheduleParallel( query , 1 , handle ) ,
             copyUnitVelocity.ScheduleParallel( query , 1 , handle ) ,
             copyUnitMass.ScheduleParallel( query , 1 , handle ) );
-
-        handle = JobHandle.CombineDependencies(
-            updateGridHandle ,
-            copyHandle );
 
         var findCollidingPairs = new FindCollidingPairsJob
         {
@@ -309,7 +303,7 @@ public class UnitDynamicCollisionSystemGrid : SystemBase
         }
     }
     [BurstCompile]
-    private struct CopyTranslationsJob : IJobEntityBatchWithIndex
+    private struct CopyPositionsJob : IJobEntityBatchWithIndex
     {
         [NativeDisableParallelForRestriction] public NativeArray<float3> copyArray;
         [ReadOnly] public ComponentTypeHandle<Translation> translationHandle;
@@ -425,74 +419,6 @@ public class UnitDynamicCollisionSystemGrid : SystemBase
         }
     }
     [BurstCompile]
-    private struct FindCollidingPairsJobList : IJobParallelFor
-    {
-        [ReadOnly] public float CELL_SIZE;
-        [ReadOnly] public int CELL_CAPACITY;
-        [ReadOnly] public int CELLS_ACROSS;
-        [ReadOnly] public float RADIUS;
-
-        [ReadOnly] public NativeArray<ushort> grid;
-        [ReadOnly] public NativeArray<float3> copyPositions;
-        [NativeDisableParallelForRestriction] public NativeList<CollidingPair>.ParallelWriter collidingPairs;
-        [NativeDisableParallelForRestriction] public NativeBitArray collisionFlags;
-
-        public void Execute( int index )
-        {
-            collisionFlags.Set( index , true );
-
-            float px = copyPositions[ index ].x;
-            float pz = copyPositions[ index ].z;
-
-            float xmin = px - RADIUS;
-            float zmin = pz - RADIUS;
-            float xmax = px + RADIUS;
-            float zmax = pz + RADIUS;
-            int bl = ( int ) ( math.floor( xmin / CELL_SIZE ) + math.floor( zmin / CELL_SIZE ) * CELLS_ACROSS );
-            int br = ( int ) ( math.floor( xmax / CELL_SIZE ) + math.floor( zmin / CELL_SIZE ) * CELLS_ACROSS );
-            int tl = ( int ) ( math.floor( xmin / CELL_SIZE ) + math.floor( zmax / CELL_SIZE ) * CELLS_ACROSS );
-            int tr = ( int ) ( math.floor( xmax / CELL_SIZE ) + math.floor( zmax / CELL_SIZE ) * CELLS_ACROSS );
-            FixedList128<int> newCells = new FixedList128<int>();
-            newCells.Add( bl );
-            if ( br != bl )
-                newCells.Add( br );
-            if ( tl != bl )
-                newCells.Add( tl );
-            if ( br != tl )
-                newCells.Add( tr );
-
-            for ( int i = 0; i < newCells.Length; i++ )
-            {
-                int gridIndex = newCells[ i ] * CELL_CAPACITY;
-                int count = 0;
-
-                while ( grid[ gridIndex + count ] != VOID_CELL_VALUE && count < CELL_CAPACITY )
-                {
-                    int otherUnitIndex = grid[ gridIndex + count ];
-
-                    if ( !collisionFlags.IsSet( otherUnitIndex ) )
-                    {
-                        float px2 = copyPositions[ otherUnitIndex ].x;
-                        float pz2 = copyPositions[ otherUnitIndex ].z;
-                        float distance = math.sqrt( ( px - px2 ) * ( px - px2 ) + ( pz - pz2 ) * ( pz - pz2 ) );
-
-                        if ( distance < RADIUS )
-                        {
-                            collidingPairs.AddNoResize( new CollidingPair
-                            {
-                                unit1 = ( ushort ) index ,
-                                unit2 = ( ushort ) otherUnitIndex ,
-                                distance = distance
-                            } );
-                        }
-                    }
-
-                    count++;
-                }
-            }
-        }
-    }
-    [BurstCompile]
     private struct ResolveCollisionsJob : IJobParallelFor
     {
         [ReadOnly] public float CELL_SIZE;
@@ -518,11 +444,12 @@ public class UnitDynamicCollisionSystemGrid : SystemBase
             float vy = copyVelocities[ unit1 ].y;
             float vz = copyVelocities[ unit1 ].z;
             float m = copyMass[ unit1 ];
+
             float px2 = copyPositions[ unit2 ].x;
             float py2 = copyPositions[ unit2 ].y;
             float pz2 = copyPositions[ unit2 ].z;
             float vx2 = copyVelocities[ unit2 ].x;
-            float vy2 = copyPositions[ unit2 ].y;
+            float vy2 = copyVelocities[ unit2 ].y;
             float vz2 = copyVelocities[ unit2 ].z;
             float m2 = copyMass[ unit2 ];
 
